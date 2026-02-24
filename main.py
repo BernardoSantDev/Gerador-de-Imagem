@@ -31,6 +31,41 @@ def gerar_imagem_dalle(prompt):
         st.error(f"Erro na geração da imagem. Código: {response.status_code}\nResposta: {response.text}")
         return None
 
+st.set_page_config(page_title="Gerador de Imagens com IA", layout="centered")
+
+st.title("🖼️ Gerador de Imagens com DALL·E")
+st.write("Descreva a imagem que você deseja gerar abaixo e clique em **Gerar Imagem**:")
+
+# 🔸 Input de texto
+prompt = st.text_input("📝 Descreva sua imagem:")
+
+# 🔸 Botão
+gerar = st.button("🚀 Gerar Imagem")
+
+# 🔸 Quando clicar no botão
+if gerar:
+    if not prompt:
+        st.warning("⚠️ Por favor, escreva uma descrição!")
+    else:
+        with st.spinner("🧠 A IA está gerando sua imagem..."):
+            imagem_url = gerar_imagem_dalle(prompt)
+
+        if imagem_url:
+            response = requests.get(imagem_url)
+            imagem = Image.open(BytesIO(response.content))
+
+            st.image(imagem, caption="🖼️ Sua imagem gerada pela IA", use_container_width=True)
+
+            buffer = BytesIO()
+            imagem.save(buffer, format="PNG")
+            buffer.seek(0)
+
+            st.download_button(
+                label="⬇️ Baixar Imagem",
+                data=buffer,
+                file_name="imagem_gerada.png",
+                mime="image/png"
+            )
 
 
 
